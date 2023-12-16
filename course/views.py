@@ -162,9 +162,11 @@ class UserCourseView(APIView):
         return Response(data, status=status.HTTP_200_OK)
 
 #     user page course rendenring...........
-
+import os
 class GetUserHomeCourseView(APIView):
     def get(self,request):
+        s = os.environ.get('HELLO')
+        print('hello',s)
         course = Course.objects.filter(is_active=True).order_by('?')[:3]
         serializer = CourseEssentialSerializer(course, many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
