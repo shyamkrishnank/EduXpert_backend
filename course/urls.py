@@ -14,4 +14,5 @@ urlpatterns = [
     path('chapter_details/<int:id>', GetChapterInChaptersView.as_view()),
     path('add_chapter', ChapterAddNewView.as_view()),
     path('userhome', GetUserHomeCourseView.as_view()),
+
 ]

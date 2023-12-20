@@ -60,6 +60,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    # 'auth_app.TokenTestMiddleware.TokenTestMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -69,6 +70,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 
 ]
+
+# CORS_ALLOW_HEADERS = ['access-control-allow-headers', 'Authorization']
 
 ROOT_URLCONF = 'backend.urls'
 
@@ -129,7 +132,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=15),
 }
 
@@ -176,4 +179,7 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 
 
+#Razor pay variables
 
+RAZOR_KEY = os.environ.get('RAZOR_KEY')
+RAZOR_KEY_SECRET = os.environ.get('RAZOR_KEY_SECRET')

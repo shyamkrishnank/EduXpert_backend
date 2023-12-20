@@ -8,6 +8,7 @@ urlpatterns = [
     path('login/', LoginView.as_view()),
     path('googlelogin/', GoogleLoginView.as_view()),
     path('otp/', OtpView.as_view()),
-    path('profile/<int:id>', UserDetailsView.as_view())
+    path('profile/<int:id>', UserDetailsView.as_view()),
+    path('instructorprofile/<int:id>', InstructorProfileView.as_view())
     
 ]

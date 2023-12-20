@@ -1,11 +1,9 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import *
 from rest_framework.response import Response
 from .serializers import *
 from rest_framework import status
-from rest_framework.generics import RetrieveAPIView
-
+from order.models import Order
 
 class CourseCategoryViews(APIView):
     def get(self, request):
@@ -15,12 +13,6 @@ class CourseCategoryViews(APIView):
             data[i['category_name']] = i['id']
         return Response({"data": data})
 
-
-class GetCourseDetail(APIView):
-    def get(self, request, id):
-        course = Course.objects.get(id=id)
-        serializer = CourseSerializer(course)
-        return Response(serializer.data)
 
 class GetChapterDetails(APIView):
     def get(self, request, id):
@@ -32,7 +24,12 @@ class GetChapterDetails(APIView):
             all_chapter_serializer = ChapterNamesSerializer(chapters, many=True)
             data = {
                 'initial_chapter': intial_chapter_serializer.data,
-                'all_chapters': all_chapter_serializer.data
+                'all_chapters': all_chapter_serializer.data,
+                'instructor' : {
+                    'id':course.created_by.id,
+                    'get_full_name':course.created_by.get_full_name,
+
+                }
             }
         else:
             data = {
@@ -41,16 +38,45 @@ class GetChapterDetails(APIView):
             }
         return Response(data, status=status.HTTP_200_OK)
 
+
+class GetCourseDetail(GetChapterDetails, APIView):
+    def get(self, request, id):
+        course = Course.objects.get(id=id)
+        serializer = CourseSerializer(course)
+        return Response(serializer.data)
+
+    def post(self,request,id):
+        course = Course.objects.get(id=id)
+        if course.is_active:
+            user_id = request.data['user_id']
+            if Order.objects.filter(user=UserAccount.objects.get(id=user_id),course=course).exists():
+                response = super().get(request, id)
+                response.data['message']='purchased'
+                print(response.data)
+                return Response(response.data,status=status.HTTP_200_OK)
+            serializer = CourseSerializer(course)
+            response = serializer.data
+            response['message']='not purchased'
+            return Response(response)
+        return Response({'message':'Sorry Course is not Available'},status=status.HTTP_404_NOT_FOUND)
+
+
+
 class GetChapterInChaptersView(APIView):
     def get(self, request, id):
         chapter = CourseChapter.objects.get(id = id)
         intial_chapter_serializer = ChapterSerializer(chapter)
         all_chapters = CourseChapter.objects.filter(course = chapter.course)
+        instructor =UserAccount.objects.get(id=chapter.course.created_by.id)
         if all_chapters:
             all_chapter_serializer = ChapterNamesSerializer(all_chapters, many=True)
             data = {
                 'initial_chapter': intial_chapter_serializer.data,
-                'all_chapters': all_chapter_serializer.data
+                'all_chapters': all_chapter_serializer.data,
+                'instructor': {
+                    'id': chapter.course.created_by.id,
+                    'get_full_name': chapter.course.created_by.get_full_name,
+                }
             }
         else:
             data = {
@@ -150,6 +176,8 @@ class DeleteCourseView(APIView):
         course.delete()
         return Response({'message':'deleted'},status=status.HTTP_200_OK)
 
+#     user page course rendenring...........
+
 class UserCourseView(APIView):
     def get(self, request, id):
         category = CourseCategory.objects.get(id = id)
@@ -161,12 +189,8 @@ class UserCourseView(APIView):
         }
         return Response(data, status=status.HTTP_200_OK)
 
-#     user page course rendenring...........
-import os
 class GetUserHomeCourseView(APIView):
     def get(self,request):
-        s = os.environ.get('HELLO')
-        print('hello',s)
         course = Course.objects.filter(is_active=True).order_by('?')[:3]
         serializer = CourseEssentialSerializer(course, many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
