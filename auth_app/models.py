@@ -37,6 +37,7 @@ class UserAccount(AbstractUser):
     otp = models.CharField(max_length=10)
     is_verified = models.BooleanField(default=False)
     is_googleAuth = models.BooleanField(default=False )
+    experience = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True,null=True)
     username = None
 

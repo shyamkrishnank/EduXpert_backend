@@ -6,6 +6,7 @@ class CategoryNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseCategory
         fields = ['id', 'category_name']
+
 class CourseNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseChapter
@@ -30,7 +31,7 @@ class CreatedByUserNameSerializer(serializers.ModelSerializer):
 class ChapterNamesSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseChapter
-        fields = ['id', 'title']
+        fields = ['id', 'title', 'description']
 
 class CourseSerializer(serializers.ModelSerializer):
     chapters = ChapterNamesSerializer(many=True, read_only=True)

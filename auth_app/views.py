@@ -2,10 +2,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from .serializers import UserAcoountSerializers, LoginSerializers
+from .serializers import UserAcoountSerializers, LoginSerializers, InstructorSerializer
+from course.serializers import CourseEssentialSerializer
 
 from .models import UserAccount
 from .mail import send_otp_via_email
+from course.models import Course
 
 
 class RegisterView(APIView):
@@ -82,6 +84,7 @@ class UserDetailsView(APIView):
             user = UserAccount.objects.get(id=id)
             serializer = UserAcoountSerializers(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
+
         except:
             return Response({"message": "user not found"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -96,3 +99,12 @@ class UserDetailsView(APIView):
         else:
             print(serializer.errors)
             return Response(serializer.errors)
+
+class InstructorProfileView(APIView):
+    def get(self,request,id):
+        try:
+            user = UserAccount.objects.get(id=id)
+            serializer = InstructorSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response({"message": "user not found"}, status=status.HTTP_406_NOT_ACCEPTABLE)
