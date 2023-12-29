@@ -29,7 +29,6 @@ class OrderDetailsView(APIView):
 class OrderSaveView(APIView):
     def post(self,request):
         data = request.data
-        print(data)
         serializer = OrderConfirmedSerializer(data=data)
         if serializer.is_valid():
             serializer.save()

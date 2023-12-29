@@ -27,10 +27,10 @@ class UserAcoountSerializers(serializers.ModelSerializer):
 
 
 class LoginSerializers(serializers.ModelSerializer):
-    email = serializers.CharField(max_length=200,write_only=True )
-    password = serializers.CharField(max_length=200,write_only=True)
-    access_token = serializers.CharField(max_length=300,read_only=True)
-    refresh_token = serializers.CharField(max_length=300,read_only=True)
+    email = serializers.CharField(max_length=200, write_only=True)
+    password = serializers.CharField(max_length=200, write_only=True)
+    access_token = serializers.CharField(max_length=300, read_only=True)
+    refresh_token = serializers.CharField(max_length=300, read_only=True)
 
     class Meta:
         model = UserAccount
@@ -41,7 +41,6 @@ class LoginSerializers(serializers.ModelSerializer):
         password = attrs.get('password')
 
         user = authenticate(email=email, password=password)
-        print(user)
 
         if not user:
             raise AuthenticationFailed("User not found")
@@ -65,3 +64,10 @@ class InstructorSerializer(serializers.ModelSerializer):
         course = Course.objects.filter(created_by=obj.id, is_active=True)
         serializer = CourseEssentialSerializer(course, many=True)
         return serializer.data
+
+
+
+class ChatUsersSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = UserAccount
+        fields = ['id', 'get_full_name', 'image']

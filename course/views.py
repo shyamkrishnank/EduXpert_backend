@@ -5,6 +5,7 @@ from .serializers import *
 from rest_framework import status
 from order.models import Order
 
+
 class CourseCategoryViews(APIView):
     def get(self, request):
         course = CourseCategory.objects.values('id', 'category_name')
@@ -92,6 +93,7 @@ class GetChapterInChaptersView(APIView):
 
 class GetInstructorCourseView(APIView):
     def get(self,request,id):
+        print(id)
         course = Course.objects.filter(created_by=(UserAccount.objects.get(id=id)))
         if course:
             serializer = CourseSerializer(course,many=True)
@@ -104,16 +106,11 @@ class GetInstructorCourseView(APIView):
 
 
 class CourseUploadViews(APIView):
+
     def post(self, request):
-        data = {
-            'course_title': request.data.get('course_title'),
-            'course_description': request.data.get('course_description'),
-            'course_category': int(request.data.get("course_category")),
-            'created_by': int(request.data.get('created_by')),
-            'price': float(request.data.get('price')),
-            'image': request.data.get('image'),
-        }
-        serializer = CourseSerializer(data=data)
+        print(request.data)
+        data = request.data
+        serializer = CourseUploadSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -145,9 +142,8 @@ class ChapterUploadView(APIView):
 class ChapterAddNewView(GetChapterDetails, APIView):
     def post(self,request):
         data = request.data
-        id = data['course_id']
-        course = Course.objects.get(id=data['course_id'])
-        data['course'] = int(data['course_id'])
+        id = data['course']
+        course = Course.objects.get(id=data['course'])
         data['chapter_no'] = Course.chapter_count(course) + 1
         serializer = ChapterSerializer(data=data)
         if serializer.is_valid():

@@ -1,13 +1,16 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.contrib.auth import authenticate
+from rest_framework.exceptions import AuthenticationFailed
+import requests
+
+
 
 from .serializers import UserAcoountSerializers, LoginSerializers, InstructorSerializer
-from course.serializers import CourseEssentialSerializer
 
 from .models import UserAccount
 from .mail import send_otp_via_email
-from course.models import Course
 
 
 class RegisterView(APIView):
@@ -28,14 +31,21 @@ class RegisterView(APIView):
 
 
 class LoginView(APIView):
-    serializer_class = LoginSerializers
     def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            return Response(serializer.data)
-        else:
-            print(serializer.errors)
-            return Response(serializer.errors)
+        data = request.data
+        user = authenticate(email=data['email'], password=data['password'])
+        if not user:
+            raise AuthenticationFailed("User not found")
+        user_token = user.token()
+        user.refresh_token = str(user_token.get('refresh'))
+        user.access_token = str(user_token.get('access'))
+        user.save()
+        data = {
+            'access_token': user.access_token,
+            'is_staff' : user.is_staff
+        }
+        return Response(data)
+
 
 
 class OtpView(APIView):
@@ -55,25 +65,38 @@ class OtpView(APIView):
 
 class GoogleLoginView(APIView):
     def post(self, request):
-        data = request.data
+        token = request.data
+        GOOGLE_ID_TOKEN_INFO_URL = 'https://www.googleapis.com/oauth2/v3/userinfo'
         try:
-            user = UserAccount.objects.get(email=data['email'])
-            user_token = user.token()
-            return Response({
-                'access_token': str(user_token.get('access')),
-                'refresh_token': str(user_token.get('refresh')),
-                'is_staff': user.is_staff
-            })
-
+           google_response = requests.get(GOOGLE_ID_TOKEN_INFO_URL, headers={'Authorization': f'Bearer {token}'})
+           data = google_response.json()
+           if data:
+               try:
+                   user = UserAccount.objects.get(email=data['email'])
+                   user_token = user.token()
+                   user.refresh_token = str(user_token.get('refresh'))
+                   user.access_token = str(user_token.get('access'))
+                   user.save()
+                   return Response({
+                        'access_token': user.access_token,
+                        'is_staff': user.is_staff
+                    })
+               except:
+                    user = UserAccount(first_name=data['given_name'], last_name=data['family_name'], email=data["email"])
+                    user_token = user.token()
+                    user.refresh_token = str(user_token.get('refresh'))
+                    user.access_token = str(user_token.get('access'))
+                    user.save()
+                    return Response({
+                        'access_token': user.access_token,
+                        'is_staff': user.is_staff
+                    })
         except:
-            user = UserAccount(first_name=data['given_name'], last_name=data['family_name'], email=data["email"])
-            user.save()
-            user_token = user.token()
-            return Response({
-                'access_token': str(user_token.get('access')),
-                'refresh_token': str(user_token.get('refresh')),
-                'is_staff': user.is_staff
-            })
+            return Response({'message':'Sorry Something Went Wrong..!'},status.HTTP_406_NOT_ACCEPTABLE)
+
+
+
+
 
 
 
