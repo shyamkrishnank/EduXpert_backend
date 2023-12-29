@@ -3,3 +3,4 @@ db.sqlite3git
 settings.py/
 media
 __pycache__/
+db.sqlite3
