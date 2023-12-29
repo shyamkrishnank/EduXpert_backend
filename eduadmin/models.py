@@ -1,9 +1,11 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password
 from rest_framework_simplejwt.tokens import RefreshToken
+import uuid
 
 
 class EduAdmin(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(max_length=30)
     password = models.CharField(max_length=30)
 

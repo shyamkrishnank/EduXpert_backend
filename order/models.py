@@ -1,8 +1,10 @@
 from django.db import models
 from auth_app.models import UserAccount
 from course.models import Course
+import uuid
 
 class Order(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     ordered_at = models.DateTimeField(auto_now=True)

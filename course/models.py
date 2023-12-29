@@ -1,8 +1,10 @@
 from django.db import models
 from auth_app.models import UserAccount
+import uuid
 
 
 class CourseCategory(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     category_name = models.CharField(max_length=200)
     category_description = models.TextField()
 
@@ -16,10 +18,11 @@ status = [
 ]
 
 class Course(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     course_title = models.CharField(max_length=30)
     course_description = models.TextField(default="no description available!")
-    course_category = models.ForeignKey(CourseCategory, on_delete=models.CASCADE)
-    created_by = models.ForeignKey(UserAccount, on_delete=models.CASCADE,related_name='courses')
+    course_category = models.ForeignKey(CourseCategory, on_delete=models.CASCADE, null=True, blank=True)
+    created_by = models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='courses', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     price = models.FloatField(default=0.00)
     image = models.ImageField(upload_to="course/", null=True, blank=True)
@@ -36,6 +39,7 @@ class Course(models.Model):
 
 
 class CourseChapter(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=100,null=True)
     description = models.CharField(max_length=200,null=True)
     course = models.ForeignKey(Course,on_delete=models.CASCADE,related_name='chapters')

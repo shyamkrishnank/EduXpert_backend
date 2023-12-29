@@ -38,6 +38,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -51,7 +53,8 @@ INSTALLED_APPS = [
     'auth_app',
     'course',
     'eduadmin',
-    'order'
+    'order',
+    'chat'
 ]
 
 MIDDLEWARE = [
@@ -60,7 +63,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # 'auth_app.TokenTestMiddleware.TokenTestMiddleware',
+    'auth_app.TokenTestMiddleware.TokenTestMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -70,6 +73,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 
 ]
+CORS_ALLOW_CREDENTIALS = True
+
 
 # CORS_ALLOW_HEADERS = ['access-control-allow-headers', 'Authorization']
 
@@ -92,7 +97,17 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'backend.wsgi.application'
+# WSGI_APPLICATION = 'backend.wsgi.application'
+ASGI_APPLICATION = 'backend.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 
 # Database
@@ -132,7 +147,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=200),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=15),
 }
 
