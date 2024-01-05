@@ -18,8 +18,11 @@ class Chats(APIView):
         all_chats = []
         authorization_header = request.headers.get('Authorization')
         if authorization_header and authorization_header.startswith('Bearer'):
-            access_token = authorization_header.split(":")[1]
-            user_id = jwt.decode(access_token, settings.SECRET_KEY, algorithms=['HS256'])['user_id']
+            access_token = authorization_header.split(" ")[1]
+            try:
+                user_id = jwt.decode(access_token, settings.SECRET_KEY, algorithms=['HS256'], options={'verify_exp': False})['user_id']
+            except Exception as e:
+                print(e)
             user_ids = [str(user_id), str(id)]
             user_ids = sorted(user_ids)
             room_group_name = f'chat_{user_ids[0]}_{user_ids[1]}'

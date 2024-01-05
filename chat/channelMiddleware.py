@@ -21,7 +21,8 @@ class JWTwebsocketMiddleware(BaseMiddleware):
                 'code':4000
             })
         else:
-           id = jwt.decode(token ,settings.SECRET_KEY, algorithms=['HS256'])['user_id']
+
+           id = jwt.decode(token ,settings.SECRET_KEY, algorithms=['HS256'],options={'verify_exp': False})['user_id']
            user_id = UUID(id)
            try:
                try:
