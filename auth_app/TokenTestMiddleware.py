@@ -1,36 +1,74 @@
+import time
+
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from rest_framework import status
+from rest_framework.response import Response
+
+from django.http import HttpHeaders
 import jwt
 from auth_app.models import UserAccount
+from rest_framework_simplejwt.views import (
+    TokenRefreshView,
+)
 from django.contrib.auth import settings
+
 
 class TokenTestMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
-    def __call__(self, request):
+
+    def set_response_token(self, response, access_token):
+        print('response modified')
+        response['access_token'] =str(access_token)
+        response['Access-Control-Expose-Headers'] = 'access_token'
+        print(response.headers)
+        return response
+
+    def __call__(self, request, *args, **kwargs):
+        print('middleware Started')
+        print(request.headers)
         authorization_header = request.headers.get('Authorization')
-        response = self.get_response(request)
         if authorization_header and authorization_header.startswith('Bearer'):
-            access_token = authorization_header.split(":")[1]
+            print('helloo')
+            access_token = authorization_header.split(" ")[1]
+            print('access initialted ----', access_token)
             try:
-                print('verify',access_token)
                 token = AccessToken(access_token)
                 token.verify()
-            except:
-                try:
-                    user = UserAccount.objects.filter(access_token = str(access_token)).first()
-                    print('user',user)
-                    refresh_token = user.refresh_token
-                    print(refresh_token)
+                print('token initally verified')
+                exp_time = jwt.decode(access_token, settings.SECRET_KEY, algorithms=['HS256'])['exp']
+                if exp_time - time.time() < 600:
+                    print('expired time')
+                    refresh_token = request.headers['Refresh-Token']
+                    print('refresh', refresh_token)
                     token = RefreshToken(refresh_token)
                     token.verify()
-                    access_token = str(token.access_token)
-                    user.access_token = access_token
-                    user.save()
-                    response['Authorization'] = f'Bearer {access_token}'
-                except:
-                    print('error occured')
+                    print('new access created')
+                    response = self.get_response(request)
+                    modified_res = self.set_response_token(response, token.access_token)
+                    return modified_res
+                else:
+                    print('noooo')
+                    print('token verified')
+            except:
+                try:
+                    print('access is invalid ready to set the refresh')
+                    refresh_token = request.headers['Refresh-Token']
+                    print('refresh',refresh_token)
+                    print('old access',access_token)
+                    token = RefreshToken(refresh_token)
+                    token.verify()
+                    print('chek acces',token.access_token)
+                    response = self.get_response(request)
+                    modified_res = self.set_response_token(response, token.access_token)
+                    print('Succededd ------>')
+                    return modified_res
+                except Exception as e:
+                    return Response({'message':'Token Expired Please Login Again'}, status=status.HTTP_401_UNAUTHORIZED)
+        response = self.get_response(request)
         return response
+
 
 
 

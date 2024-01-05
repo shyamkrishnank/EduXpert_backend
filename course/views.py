@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from .serializers import *
 from rest_framework import status
 from order.models import Order
+from rest_framework.authentication import TokenAuthentication
 
 
 class CourseCategoryViews(APIView):
@@ -41,7 +42,10 @@ class GetChapterDetails(APIView):
 
 
 class GetCourseDetail(GetChapterDetails, APIView):
+    authentication_classes = [TokenAuthentication]
+
     def get(self, request, id):
+        print(request.user)
         course = Course.objects.get(id=id)
         serializer = CourseSerializer(course)
         return Response(serializer.data)
@@ -53,7 +57,6 @@ class GetCourseDetail(GetChapterDetails, APIView):
             if Order.objects.filter(user=UserAccount.objects.get(id=user_id),course=course).exists():
                 response = super().get(request, id)
                 response.data['message']='purchased'
-                print(response.data)
                 return Response(response.data,status=status.HTTP_200_OK)
             serializer = CourseSerializer(course)
             response = serializer.data
@@ -129,7 +132,7 @@ class ChapterUploadView(APIView):
             for key, value in data.items():
                 if key[-1] == str(i):
                     chapter[key[:-2]] = value
-            chapter['course']=int(data['course_id'])
+            chapter['course']= data['course_id']
             chapter['chapter_no'] = Course.chapter_count(course) + 1
             serializer = ChapterSerializer(data=chapter)
             if serializer.is_valid():
@@ -166,11 +169,26 @@ class CourseEditView(APIView):
             return Response(serializer.data)
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+class ChapterEditView(APIView):
+    def post(self,request,id):
+        data = request.data
+        chapter = CourseChapter.objects.get(id = id)
+        chapter_serializer = ChapterSerializer(chapter, data=data, partial=True)
+        if chapter_serializer.is_valid():
+            chapter_serializer.save()
+            return Response(chapter_serializer.data, status=status.HTTP_200_OK)
+        return Response({'message' : 'Something went wrong'}, status=status.HTTP_200_OK)
+
 class DeleteCourseView(APIView):
-    def get(self,request,id):
+    def get(self, request, id):
         course = Course.objects.get(id = id)
+        order = Order.objects.filter(course = course)
+        if order:
+            data = {'message': 'There are parchases for the course, Could not procced the delete request'}
+            return Response(data, status=status.HTTP_403_FORBIDDEN)
         course.delete()
-        return Response({'message':'deleted'},status=status.HTTP_200_OK)
+        return Response({'message': 'deleted'}, status=status.HTTP_200_OK)
 
 #     user page course rendenring...........
 
@@ -180,8 +198,8 @@ class UserCourseView(APIView):
         course = Course.objects.filter(course_category = category,is_active = True)
         serializer = CourseEssentialSerializer(course, many=True)
         data = {
-            'course' : serializer.data,
-            'category' : category.category_name
+            'course': serializer.data,
+            'category': category.category_name
         }
         return Response(data, status=status.HTTP_200_OK)
 

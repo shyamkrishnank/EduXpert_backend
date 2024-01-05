@@ -32,7 +32,7 @@ SECRET_KEY = 'django-insecure-k*^%_5$vq5mf71$l$_-m@&^&rasp=ag)ya0b#-97#nsfz*4q_i
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -58,25 +58,39 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
-    "django.middleware.common.CommonMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
-    'auth_app.TokenTestMiddleware.TokenTestMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'auth_app.TokenTestMiddleware.TokenTestMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-
 ]
+
+CORS_ALLOW_HEADERS = [
+    'Accept',
+    'Accept-Encoding',
+    'Authorization',
+    'Content-Type',
+    'DNT',
+    'Origin',
+    'User-Agent',
+    'X-Requested-With',
+    'X-CSRFToken',
+    'Refresh-Token',
+]
+
+# CORS_ORIGIN_WHITELIST = [
+#     'http://localhost:5173',  # Add your frontend origin
+# ]
+
 CORS_ALLOW_CREDENTIALS = True
-
-
-# CORS_ALLOW_HEADERS = ['access-control-allow-headers', 'Authorization']
 
 ROOT_URLCONF = 'backend.urls'
 
@@ -147,8 +161,9 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=200),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=15),
+
 }
 
 # Internationalization

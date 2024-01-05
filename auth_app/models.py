@@ -36,7 +36,7 @@ class UserAccount(AbstractUser):
     sociallink = models.TextField(null=True)
     image = models.ImageField(upload_to='users',null=True)
     email = models.CharField(max_length=300,unique=True)
-    otp = models.CharField(max_length=10)
+    otp = models.CharField(max_length=10, null=True)
     is_verified = models.BooleanField(default=False)
     is_googleAuth = models.BooleanField(default=False)
     experience = models.IntegerField(default=0)
