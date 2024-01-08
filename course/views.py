@@ -8,6 +8,8 @@ from rest_framework.authentication import TokenAuthentication
 
 
 class CourseCategoryViews(APIView):
+    permission_classes = []
+
     def get(self, request):
         course = CourseCategory.objects.values('id', 'category_name')
         data = dict()

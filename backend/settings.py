@@ -54,7 +54,8 @@ INSTALLED_APPS = [
     'course',
     'eduadmin',
     'order',
-    'chat'
+    'chat',
+    'notification'
 ]
 
 MIDDLEWARE = [

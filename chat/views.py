@@ -8,7 +8,7 @@ import jwt
 import uuid
 from .serializers import ChatSerializer
 from auth_app.serializers import ChatUsersSerializers
-
+from notification.models import NotificationRoom, Notification
 from .models import Chat, ChatRoom
 
 
@@ -26,6 +26,12 @@ class Chats(APIView):
             user_ids = [str(user_id), str(id)]
             user_ids = sorted(user_ids)
             room_group_name = f'chat_{user_ids[0]}_{user_ids[1]}'
+            room = NotificationRoom.objects.get(name=f'notifications_{user_id}')
+            notification = Notification.objects.filter(room=room, user=UserAccount.objects.get(id=id), is_read=False)
+            if notification:
+                for obj in notification:
+                    obj.is_read = True
+                    obj.save()
             room = ChatRoom.objects.filter(name=room_group_name).first()
             if room:
                 chats = Chat.objects.filter(room = room)

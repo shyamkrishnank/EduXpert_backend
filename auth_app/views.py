@@ -4,8 +4,7 @@ from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework.exceptions import AuthenticationFailed
 import requests
-from rest_framework.permissions import AllowAny
-
+from notification.models import NotificationRoom
 import json
 
 
@@ -51,6 +50,10 @@ class LoginView(APIView):
             'access_token': str(user_token.get('access')),
             'is_staff' : user.is_staff,
         }
+        room = NotificationRoom.objects.filter(name=f'notifications_{str(user.id)}').first()
+        if not room:
+            notificationRoom = NotificationRoom(name=f'notifications_{str(user.id)}')
+            notificationRoom.save()
         response = Response(data, headers={
             'refresh_token': str(user_token.get('refresh')),
             'Access-Control-Expose-Headers': 'refresh_token'
@@ -94,6 +97,10 @@ class GoogleLoginView(APIView):
                        'access_token': str(user_token.get('access')),
                        'is_staff': user.is_staff,
                    }
+                   room = NotificationRoom.objects.filter(name=f'notifications_{str(user.id)}').first()
+                   if not room:
+                       notificationRoom = NotificationRoom(name=f'notifications_{str(user.id)}')
+                       notificationRoom.save()
                    response = Response(data, headers={
                        'refresh_token': str(user_token.get('refresh')),
                        'Access-Control-Expose-Headers': 'refresh_token'
@@ -102,11 +109,14 @@ class GoogleLoginView(APIView):
                except:
                     user = UserAccount(first_name=data['given_name'], last_name=data['family_name'], email=data["email"])
                     user_token = user.token()
-                    user_token = user.token()
                     data = {
                         'access_token': str(user_token.get('access')),
                         'is_staff': user.is_staff,
                     }
+                    room = NotificationRoom.objects.filter(name=f'notifications_{str(user.id)}').first()
+                    if not room:
+                        notificationRoom = NotificationRoom(name=f'notifications_{str(user.id)}')
+                        notificationRoom.save()
                     response = Response(data, headers={
                         'refresh_token': str(user_token.get('refresh')),
                         'Access-Control-Expose-Headers': 'refresh_token'
@@ -164,7 +174,6 @@ class InstructorProfileView(APIView):
 
     def get(self,request,id):
         print('hellooo')
-
         try:
             user = UserAccount.objects.get(id=id)
             serializer = InstructorSerializer(user)
