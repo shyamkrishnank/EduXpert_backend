@@ -1,7 +1,5 @@
 from channels.middleware import BaseMiddleware
-from rest_framework.exceptions import AuthenticationFailed
 from django.db import close_old_connections
-from auth_app.models import UserAccount
 import jwt
 from django.contrib.auth import settings
 from uuid import UUID
@@ -11,17 +9,21 @@ from uuid import UUID
 class JWTwebsocketMiddleware(BaseMiddleware):
     async def __call__(self, scope, receive, send):
         close_old_connections()
+        print(scope)
         query_string = scope.get('query_string', b"").decode('utf-8','replace')
-        query_params = dict(qp.split('=') for qp in query_string.split('&'))
+        print(query_string)
+        try:
+            query_params = dict(qp.split('=') for qp in query_string.split('&'))
+        except:
+            query_params = dict(query_string.split("="))
         token = query_params.get('token', None)
         recever_id = query_params.get('chat_with', None)
         if token is None:
             await send({
-                'type':'websocket.close',
-                'code':4000
+                'type': 'websocket.close',
+                'code': 4000
             })
         else:
-
            id = jwt.decode(token ,settings.SECRET_KEY, algorithms=['HS256'],options={'verify_exp': False})['user_id']
            user_id = UUID(id)
            try:
