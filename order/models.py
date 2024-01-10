@@ -13,3 +13,7 @@ class Order(models.Model):
     order_id = models.CharField(max_length=200)
     signature = models.CharField(max_length=200)
     status = models.BooleanField(default=True)
+
+class Wallet(models.Model):
+    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
+    amount = models.FloatField()
