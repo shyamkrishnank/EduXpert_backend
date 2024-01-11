@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Order
+from .models import Order,Wallet
 from auth_app.models import UserAccount
 from course.models import Course
 
@@ -47,4 +47,9 @@ class OrderFullDetailsSerializer(serializers.ModelSerializer):
     course = CourseDetailsSerializers(read_only=True)
     class Meta:
         model = Order
+        fields = '__all__'
+
+class WalletSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Wallet
         fields = '__all__'

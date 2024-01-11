@@ -6,7 +6,7 @@ from .serializers import *
 from django.contrib.auth.hashers import check_password
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView,RetrieveAPIView
 
 
 
@@ -75,6 +75,8 @@ class InstructorsView(ListAPIView):
     queryset = UserAccount.objects.filter(is_staff=True, is_superuser=False)
     serializer_class = UserAcoountSerializers
     pagination_class = SetPage
+
+
 
 
 

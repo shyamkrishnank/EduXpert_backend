@@ -6,18 +6,20 @@ from rest_framework import status
 from razorpay import Client
 from django.conf import settings
 from rest_framework.pagination import PageNumberPagination
+import uuid
 
 
 
 from auth_app.models import UserAccount
-from .models import Order
+from .models import *
 from .serializers import *
 from course.serializers import CourseEssentialSerializer
 
 
-class OrderDetailsView(APIView):
+class OrderRazorView(APIView):
     def post(self, request):
         data = request.data
+        print(data)
         order_data = {"amount": data['amount']*100, "currency": "INR", "receipt": "order_rcptid_11"}
         client = Client(auth=(settings.RAZOR_KEY,settings.RAZOR_KEY_SECRET))
         payment = client.order.create(data=order_data)
@@ -33,6 +35,12 @@ class OrderDetailsView(APIView):
 class OrderSaveView(APIView):
     def post(self,request):
         data = request.data
+        print(data)
+        course = Course.objects.get(id=uuid.UUID(data['course']))
+        instructor = course.created_by
+        wallet = Wallet.objects.get(user = instructor)
+        wallet.amount = wallet.amount + data['amount']
+        wallet.save()
         serializer = OrderConfirmedSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -70,6 +78,15 @@ class OrderDetailsView(generics.RetrieveAPIView):
 
 
 
-
-
+class InstructorWallet(APIView):
+    def get(self,request,id):
+        user = request.user
+        try:
+            wallet = Wallet.objects.get(user = user)
+            serializer = WalletSerializers(wallet)
+            return Response(serializer.data,status = status.HTTP_200_OK)
+        except:
+            wallet = Wallet(user = user)
+            wallet.save()
+            return Response(wallet,status= status.HTTP_200_OK)
 
