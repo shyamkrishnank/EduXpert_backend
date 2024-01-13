@@ -55,7 +55,8 @@ INSTALLED_APPS = [
     'eduadmin',
     'order',
     'chat',
-    'notification'
+    'notification',
+    'chatbot'
 ]
 
 MIDDLEWARE = [
@@ -208,6 +209,11 @@ EMAIL_PORT = 587
 EMAIL_USE_SSL = False
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+
+
+#Open Ai key
+
+OPENAI_KEY = os.environ.get('OPENAI_KEY')
 
 
 #Razor pay variables

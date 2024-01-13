@@ -27,7 +27,8 @@ urlpatterns = [
     path('eduadmin/', include('eduadmin.urls')),
     path('order/', include('order.urls')),
     path('chat/', include('chat.urls')),
-    path('notifications/', include('notification.urls'))
+    path('notifications/', include('notification.urls')),
+    path('chatbot', include('chatbot.urls'))
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

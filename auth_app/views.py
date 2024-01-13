@@ -92,10 +92,11 @@ class GoogleLoginView(APIView):
                try:
                    user = UserAccount.objects.get(email=data['email'])
                    user_token = user.token()
-                   user_token = user.token()
                    data = {
                        'access_token': str(user_token.get('access')),
                        'is_staff': user.is_staff,
+                       'already_user': True
+
                    }
                    room = NotificationRoom.objects.filter(name=f'notifications_{str(user.id)}').first()
                    if not room:
@@ -103,11 +104,13 @@ class GoogleLoginView(APIView):
                        notificationRoom.save()
                    response = Response(data, headers={
                        'refresh_token': str(user_token.get('refresh')),
-                       'Access-Control-Expose-Headers': 'refresh_token'
+                       'Access-Control-Expose-Headers': 'refresh_token',
+
                    })
                    return response
                except:
                     user = UserAccount(first_name=data['given_name'], last_name=data['family_name'], email=data["email"])
+                    user.save()
                     user_token = user.token()
                     data = {
                         'access_token': str(user_token.get('access')),
