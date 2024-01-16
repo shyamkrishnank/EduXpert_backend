@@ -73,11 +73,12 @@ class OtpView(APIView):
             if user.otp == otp:
                 user.is_verified = True
                 user.save()
-                return Response({"message": 'success'})
+                serializer = UserAcoountSerializers(user)
+                return Response(serializer.data,status=status.HTTP_200_OK)
             else:
-                return Response({"message": 'otp enterd wrong'})
+                return Response({"message": 'otp enterd wrong'},status=status.HTTP_422_UNPROCESSABLE_ENTITY)
         except:
-            return Response({"message": "something went wrong"})
+            return Response({"message": "something went wrong"},status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 class GoogleLoginView(APIView):
     permission_classes = []
