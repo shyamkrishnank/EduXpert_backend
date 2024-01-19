@@ -11,7 +11,7 @@ class UserAcoountSerializers(serializers.ModelSerializer):
     class Meta:
         model = UserAccount
         fields = ["id", "first_name", 'last_name','headline','is_active','is_staff','created_at','otp',
-                  'image', 'email', 'password','experience', 'phone', 'bio', 'sociallink']
+                  'image', 'email', 'password','experience', 'phone', 'bio', 'sociallink','otp_expiry']
         extra_kwargs = {
             "password": {"write_only": True}
         }

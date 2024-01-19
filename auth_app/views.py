@@ -5,6 +5,9 @@ from django.contrib.auth import authenticate
 from rest_framework.exceptions import AuthenticationFailed
 import requests
 from notification.models import NotificationRoom
+from django.utils import timezone
+from datetime import timedelta
+
 import json
 
 
@@ -25,10 +28,12 @@ class RegisterView(APIView):
             if cache_data.is_verified == False:
                 cache_data.delete()
             else:
-                return Response({'message' : 'Email allready in use!'}, status=status.HTTP_409_CONFLICT)
+                return Response({'message' : 'Email already in use!'}, status=status.HTTP_409_CONFLICT)
         otp = send_otp_via_email(data['email'])
         print(otp)
         data['otp'] = otp
+        data['otp_expiry'] = timezone.now() + timedelta(minutes=1)
+        print(data['otp_expiry'])
         serializer = UserAcoountSerializers(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -49,6 +54,7 @@ class LoginView(APIView):
         data = {
             'access_token': str(user_token.get('access')),
             'is_staff' : user.is_staff,
+            'name' : user.first_name
         }
         room = NotificationRoom.objects.filter(name=f'notifications_{str(user.id)}').first()
         if not room:
@@ -62,6 +68,8 @@ class LoginView(APIView):
 
 
 
+
+
 class OtpView(APIView):
     permission_classes = []
 
@@ -71,14 +79,34 @@ class OtpView(APIView):
         try:
             user = UserAccount.objects.get(email=email)
             if user.otp == otp:
+                if user.otp_expiry < timezone.now():
+                    return Response({"message": 'OTP Expired'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
                 user.is_verified = True
                 user.save()
                 serializer = UserAcoountSerializers(user)
                 return Response(serializer.data,status=status.HTTP_200_OK)
             else:
-                return Response({"message": 'otp enterd wrong'},status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-        except:
+                return Response({"message": 'OTP enterd wrong'},status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        except Exception as e:
+            print(e)
             return Response({"message": "something went wrong"},status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+class ResendOTP(APIView):
+    def post(self,request):
+        try:
+            email = request.data['email']
+            user = UserAccount.objects.get(email = email)
+            otp = send_otp_via_email(email)
+            user.otp = otp
+            user.otp_expiry = timezone.now() + timedelta(minutes=1)
+            user.save()
+            return Response({'message':'OTP has been send to the email'},status=status.HTTP_200_OK)
+        except:
+            return Response({'message':'Something went wrong'},status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+
+
+
 
 class GoogleLoginView(APIView):
     permission_classes = []
@@ -96,6 +124,7 @@ class GoogleLoginView(APIView):
                    data = {
                        'access_token': str(user_token.get('access')),
                        'is_staff': user.is_staff,
+                       'name': user.first_name,
                        'already_user': True
 
                    }
@@ -115,6 +144,7 @@ class GoogleLoginView(APIView):
                     user_token = user.token()
                     data = {
                         'access_token': str(user_token.get('access')),
+                        'name': user.first_name,
                         'is_staff': user.is_staff,
                     }
                     room = NotificationRoom.objects.filter(name=f'notifications_{str(user.id)}').first()
@@ -184,3 +214,34 @@ class InstructorProfileView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except:
             return Response({"message": "user not found"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+
+class ForgetPasswordView(APIView):
+    def post(self,request):
+        email = request.data['email']
+        try:
+            user = UserAccount.objects.get(email = email)
+            otp = send_otp_via_email(email)
+            user.otp = otp
+            user.otp_expiry = timezone.now() + timedelta(minutes=1)
+            user.save()
+            return Response({'message':'Otp has send to the mail'},status=status.HTTP_200_OK)
+
+        except:
+            return Response({'message':'Email not registered'},status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+class NewPasswordView(APIView):
+    def post(self,request):
+        try:
+            user = UserAccount.objects.get(email = request.data['email'])
+            print("user",user)
+            user.set_password(request.data['password'])
+            print(request.data['password'])
+            user.save()
+            data = {
+                'message': 'Password Changed Successfully',
+                'email' : user.email
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        except:
+            return Response({'message':'Something Error Occured'},status=status.HTTP_422_UNPROCESSABLE_ENTITY)

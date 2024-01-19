@@ -1,4 +1,5 @@
 from rest_framework.views import APIView
+from django.views.generic import ListView
 from .models import *
 from rest_framework.response import Response
 from .serializers import *
@@ -9,13 +10,24 @@ from rest_framework.authentication import TokenAuthentication
 
 class CourseCategoryViews(APIView):
     permission_classes = []
-
     def get(self, request):
         course = CourseCategory.objects.values('id', 'category_name')
         data = dict()
         for i in course:
             data[i['category_name']] = i['id']
         return Response({"data": data})
+
+class CourseSearchView(APIView):
+    def get(self,request,character=None):
+        if character == None:
+            return Response(status=status.HTTP_200_OK)
+        queryset = Course.objects.filter(course_title__istartswith=character)
+        if queryset:
+            serializer = CourseSearchSerializers(queryset, many=True)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response([],status=status.HTTP_200_OK)
+
+
 
 
 class GetChapterDetails(APIView):
@@ -210,6 +222,20 @@ class GetUserHomeCourseView(APIView):
         course = Course.objects.filter(is_active=True).order_by('?')[:3]
         serializer = CourseEssentialSerializer(course, many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
+
+class GetAllCourses(APIView):
+    permission_classes = []
+    def get(self,request):
+        category = CourseCategory.objects.all()
+        all_course = {}
+        for i in category:
+            course = Course.objects.filter(course_category = i, is_active = True)
+            serializer = CourseEssentialSerializer(course, many=True)
+            all_course[i.category_name] = serializer.data
+        return Response(all_course, status=status.HTTP_200_OK)
+
+
+
 
 
 

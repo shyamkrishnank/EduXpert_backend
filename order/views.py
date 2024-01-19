@@ -65,7 +65,6 @@ class InstructorCourseOrders(generics.ListAPIView):
     serializer_class = InstructorOrderSerializer
     pagination_class = SetPage
 
-
     def get_queryset(self):
         instructor_id = self.kwargs['instructor_id']
         return Order.objects.filter(course__created_by__id = instructor_id)

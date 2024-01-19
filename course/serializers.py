@@ -18,6 +18,11 @@ class ChapterForEditSerializer(serializers.ModelSerializer):
         model = CourseChapter
         fields = '__all__'
 
+class CourseSearchSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Course
+        fields = ['id', 'course_title']
+
 class ChapterSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseChapter
