@@ -15,6 +15,6 @@ class Order(models.Model):
     status = models.BooleanField(default=True)
 
 class Wallet(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4(),editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4,editable=False)
     user = models.ForeignKey(UserAccount, on_delete=models.CASCADE,related_name='wallet')
     amount = models.FloatField(default=0.0)

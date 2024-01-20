@@ -234,6 +234,56 @@ class GetAllCourses(APIView):
             all_course[i.category_name] = serializer.data
         return Response(all_course, status=status.HTTP_200_OK)
 
+#reviews.....
+
+class AddReview(APIView):
+    def post(self,request):
+        data = request.data
+        data['user'] = request.user.id
+        serializer = AddReviewSerializer(data=data)
+        if serializer.is_valid():
+            saved_review = serializer.save()
+            serialized_data = GetAllReviewSerializer(saved_review).data
+            return Response(serialized_data,status=status.HTTP_200_OK)
+        else:
+            return Response({'message':'Sorry something went wrong'},status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+class GetAllReview(APIView):
+    def get(self,request,course_id):
+        reviews = Reviews.objects.filter(course = course_id)
+        serializer = GetAllReviewSerializer(reviews, many=True)
+        data = serializer.data
+        for review in data:
+            like_model = ReviewLikes.objects.filter(review = Reviews.objects.get(id=review['id']), user = request.user).first()
+            if like_model:
+                is_liked = like_model.is_liked
+            else:
+                is_liked = False
+            review['is_liked'] = is_liked
+        return Response(data, status=status.HTTP_200_OK)
+
+class LikedReview(APIView):
+    def get(self, request, review_id):
+        review = Reviews.objects.get(id = review_id)
+        like_review, created = ReviewLikes.objects.get_or_create(review = review, user = request.user)
+        if not created:
+            like_review.is_liked = not like_review.is_liked
+            like_review.save()
+        else:
+            like_review.save()
+        return Response(status=status.HTTP_200_OK)
+
+class DeleteReview (APIView):
+    def get(self, request, review_id):
+        review = Reviews.objects.get(id = review_id)
+        review.delete()
+        return Response(status=status.HTTP_200_OK)
+
+
+
+
+
+
 
 
 

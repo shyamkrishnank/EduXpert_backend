@@ -47,24 +47,34 @@ class LoginView(APIView):
 
     def post(self, request):
         data = request.data
-        user = authenticate(email=data['email'], password=data['password'])
-        if not user:
-            raise AuthenticationFailed("User not found")
-        user_token = user.token()
-        data = {
-            'access_token': str(user_token.get('access')),
-            'is_staff' : user.is_staff,
-            'name' : user.first_name
-        }
-        room = NotificationRoom.objects.filter(name=f'notifications_{str(user.id)}').first()
-        if not room:
-            notificationRoom = NotificationRoom(name=f'notifications_{str(user.id)}')
-            notificationRoom.save()
-        response = Response(data, headers={
-            'refresh_token': str(user_token.get('refresh')),
-            'Access-Control-Expose-Headers': 'refresh_token'
-        })
-        return response
+        try:
+            user = authenticate(email=data['email'], password=data['password'])
+            if not user:
+                raise AuthenticationFailed("User not found")
+            user_token = user.token()
+            data = {
+                'access_token': str(user_token.get('access')),
+                'is_staff' : user.is_staff,
+                'name' : user.first_name
+            }
+            room = NotificationRoom.objects.filter(name=f'notifications_{str(user.id)}').first()
+            if not room:
+                notificationRoom = NotificationRoom(name=f'notifications_{str(user.id)}')
+                notificationRoom.save()
+            response = Response(data, headers={
+                'refresh_token': str(user_token.get('refresh')),
+                'Access-Control-Expose-Headers': 'refresh_token'
+            })
+            return response
+        except AuthenticationFailed as e:
+            error_detail = str(e.detail)
+            if "User not found" in error_detail:
+                return Response({'message': 'Invalid Email Or Password!'}, status=status.HTTP_401_UNAUTHORIZED)
+            elif "Invalid password" in error_detail:
+                return Response({'message': 'Password Incorrect!'}, status=status.HTTP_401_UNAUTHORIZED)
+            else:
+                return Response({'message': 'Something Error Occured!'}, status=status.HTTP_401_UNAUTHORIZED)
+
 
 
 

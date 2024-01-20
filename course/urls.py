@@ -19,4 +19,9 @@ urlpatterns = [
     path('add_chapter', ChapterAddNewView.as_view()),
     path('userhome', GetUserHomeCourseView.as_view()),
 
+    path('addreview/', AddReview.as_view()),
+    path('get_review/<uuid:course_id>', GetAllReview.as_view()),
+    path('like_review/<uuid:review_id>', LikedReview.as_view()),
+    path('delete_review/<uuid:review_id>', DeleteReview.as_view()),
+
 ]
