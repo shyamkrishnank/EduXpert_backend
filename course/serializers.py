@@ -65,16 +65,15 @@ class AddReviewSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ReplySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ReviewRepley
-        fields = '__all__'
-
 class ReviewedUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserAccount
         fields = ['id','get_full_name','image']
-
+class ReplySerializer(serializers.ModelSerializer):
+    user = ReviewedUserSerializer(read_only=True)
+    class Meta:
+        model = ReviewRepley
+        fields = '__all__'
 
 class GetAllReviewSerializer(serializers.ModelSerializer):
     reply = ReplySerializer(many=True, read_only=True)
@@ -82,6 +81,24 @@ class GetAllReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reviews
         fields = ['id', 'user', 'course', 'comment','timestamp','liked_count','reply']
+
+class GetInstructorReviewSerializer(serializers.ModelSerializer):
+    reply = ReplySerializer(many=True, read_only=True)
+    user = ReviewedUserSerializer(read_only=True)
+    course = CourseEssentialSerializer(read_only=True)
+    class Meta:
+        model = Reviews
+        fields = ['id', 'user', 'course', 'comment','timestamp','liked_count','reply']
+
+class ReviewReplySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReviewRepley
+        fields = '__all__'
+
+class ReplySaveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReviewRepley
+        fields = '__all__'
 
 
 

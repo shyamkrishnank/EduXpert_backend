@@ -24,4 +24,8 @@ urlpatterns = [
     path('like_review/<uuid:review_id>', LikedReview.as_view()),
     path('delete_review/<uuid:review_id>', DeleteReview.as_view()),
 
+    path('instructor_review/<uuid:instructor_id>', InstructorReview.as_view()),
+    path('review_reply/', InstructorReply.as_view()),
+    path('delete_reply/<uuid:reply_id>', DeleteReply.as_view()),
+
 ]
