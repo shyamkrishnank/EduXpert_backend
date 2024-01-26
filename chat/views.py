@@ -59,6 +59,8 @@ class ChatLists(APIView):
             if users:
                 users_serializer = ChatUsersSerializers(users, many=True)
                 return Response(users_serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response([],status=status.HTTP_200_OK)
         return Response(users,status=status.HTTP_200_OK)
 
 

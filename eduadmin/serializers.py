@@ -15,11 +15,11 @@ class ChapterSerializer(serializers.ModelSerializer):
 
 
 class CourseSerializer(serializers.ModelSerializer):
-    chapters = ChapterSerializer(many=True, read_only=True)
     created_by =  Created_bySerializer(many=False, read_only=True)
     class Meta:
         model = Course
         fields = '__all__'
+
 
 class InstructorsCourseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -33,3 +33,5 @@ class UserAcoountSerializers(serializers.ModelSerializer):
         model = UserAccount
         fields = ["id", "first_name", 'last_name','headline','is_active','is_staff','created_at',
                   'image', 'email', 'courses', 'phone', 'bio', 'sociallink']
+
+

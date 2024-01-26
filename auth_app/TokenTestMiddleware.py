@@ -4,12 +4,7 @@ from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework import status
 from rest_framework.response import Response
 
-from django.http import HttpHeaders
 import jwt
-from auth_app.models import UserAccount
-from rest_framework_simplejwt.views import (
-    TokenRefreshView,
-)
 from django.contrib.auth import settings
 
 

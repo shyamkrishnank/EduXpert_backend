@@ -50,8 +50,10 @@ class LoginView(APIView):
         try:
             user = authenticate(email=data['email'], password=data['password'])
             if not user:
-                raise AuthenticationFailed("User not found")
+                raise AuthenticationFailed()
             user_token = user.token()
+            if user.is_superuser:
+                return Response({'message': 'Please login in the admin login'}, status=status.HTTP_401_UNAUTHORIZED)
             data = {
                 'access_token': str(user_token.get('access')),
                 'is_staff' : user.is_staff,
@@ -67,8 +69,9 @@ class LoginView(APIView):
             })
             return response
         except AuthenticationFailed as e:
+            print(e.detail)
             error_detail = str(e.detail)
-            if "User not found" in error_detail:
+            if "Incorrect authentication credentials" in error_detail:
                 return Response({'message': 'Invalid Email Or Password!'}, status=status.HTTP_401_UNAUTHORIZED)
             elif "Invalid password" in error_detail:
                 return Response({'message': 'Password Incorrect!'}, status=status.HTTP_401_UNAUTHORIZED)
