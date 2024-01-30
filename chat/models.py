@@ -1,6 +1,7 @@
+import uuid
 from django.db import models
 from auth_app.models import UserAccount
-import uuid
+
 
 
 
