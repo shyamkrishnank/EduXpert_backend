@@ -73,7 +73,10 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
+    "http://51.21.82.18/",
+    "https://51.21.82.18/",
+    "eduxpert.cloud",
+    "www.eduxpert.cloud"
 ]
 
 CORS_ALLOW_HEADERS = [
