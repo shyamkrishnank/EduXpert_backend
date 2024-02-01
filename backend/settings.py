@@ -73,8 +73,8 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://51.21.82.18/",
-    "https://51.21.82.18/",
+    "http://51.21.82.18",
+    "https://51.21.82.18",
     "https://eduxpert.cloud",
     # "http://127.0.0.1:8000",
     # "http://localhost:5173"
@@ -204,7 +204,6 @@ STORAGES = {
     'default': {
         'BACKEND': 'django.core.files.storage.FileSystemStorage',
         'OPTIONS': {
-            # Your storage options here
         },
     },
     'staticfiles': {

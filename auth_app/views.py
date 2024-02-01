@@ -110,6 +110,8 @@ class OtpView(APIView):
             return Response({"message": "something went wrong"},status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 class ResendOTP(APIView):
+    permission_classes = []
+
     def post(self,request):
         try:
             email = request.data['email']
@@ -179,6 +181,8 @@ class GoogleLoginView(APIView):
 
 
 class GoogleSignUpView(GoogleLoginView,APIView):
+    permission_classes = []
+
 
     def post(self,request,is_staff=None):
         response = super().post(request)
@@ -235,6 +239,8 @@ class InstructorProfileView(APIView):
 
 
 class ForgetPasswordView(APIView):
+    permission_classes = []
+
     def post(self,request):
         email = request.data['email']
         try:
@@ -249,6 +255,8 @@ class ForgetPasswordView(APIView):
             return Response({'message':'Email not registered'},status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 class NewPasswordView(APIView):
+    permission_classes = []
+
     def post(self,request):
         try:
             user = UserAccount.objects.get(email = request.data['email'])
