@@ -13,10 +13,8 @@ urlpatterns = [
     path('instructors', InstructorsView.as_view()),
     path('instructors_details/<uuid:id>', UserDetailView.as_view()),
     path('instructor_status/<uuid:id>', UserActivation.as_view()),
-
-    path('orders/', Orders.as_view()),
-
-    path('dashboard/', AdminDashboard.as_view())
+    path('orders', Orders.as_view()),
+    path('dashboard', AdminDashboard.as_view())
 
 
 
