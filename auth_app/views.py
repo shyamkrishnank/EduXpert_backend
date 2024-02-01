@@ -7,6 +7,7 @@ import requests
 from notification.models import NotificationRoom
 from django.utils import timezone
 from datetime import timedelta
+from order.models import Wallet
 
 import json
 
@@ -54,6 +55,10 @@ class LoginView(APIView):
             user_token = user.token()
             if user.is_superuser:
                 return Response({'message': 'Please login in the admin login'}, status=status.HTTP_401_UNAUTHORIZED)
+            if user.is_staff:
+                wallet, created = Wallet.objects.get_or_create(user=user)
+                if created:
+                    wallet.save()
             data = {
                 'access_token': str(user_token.get('access')),
                 'is_staff' : user.is_staff,

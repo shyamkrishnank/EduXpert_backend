@@ -76,7 +76,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://51.21.82.18/",
     "https://51.21.82.18/",
     "https://eduxpert.cloud",
-    # "http://127.0.0.1:8000"
+    # "http://127.0.0.1:8000",
+    # "http://localhost:5173"
 ]
 
 CORS_ALLOW_HEADERS = [
@@ -124,7 +125,8 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            # "hosts": [("127.0.0.1", 6379)],
+            "hosts": [("51.21.82.18", 6379)],
         },
     },
 }
@@ -167,7 +169,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=90),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=300),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=25),
 
 }
