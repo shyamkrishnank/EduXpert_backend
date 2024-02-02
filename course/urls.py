@@ -5,7 +5,7 @@ urlpatterns = [
     path('course_category', CourseCategoryViews.as_view()),
     path('upload_course', CourseUploadViews.as_view()),
     path('get_course/<uuid:id>', GetCourseDetail.as_view()),
-    path('get_allcourse/', GetAllCourses.as_view()),
+    path('get_allcourse', GetAllCourses.as_view()),
     path('search_course/<str:character>',CourseSearchView.as_view()),
     path('search_course/',CourseSearchView.as_view()),
     path('chapter_upload', ChapterUploadView.as_view()),

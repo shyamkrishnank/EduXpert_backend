@@ -78,6 +78,8 @@ CORS_ALLOWED_ORIGINS = [
     "https://eduxpert.cloud",
     "http://eduxpert.cloud",  # You can add both HTTP and HTTPS versions if needed
     "https://www.eduxpert.cloud",  # You can add variations of your domain
+    # "http://127.0.0.1:8000",
+    # "http://localhost:5173"
     # Add more origins as needed
 ]
 CORS_ALLOW_HEADERS = [
