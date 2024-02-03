@@ -13,7 +13,6 @@ from .models import Chat, ChatRoom
 
 
 class Chats(APIView):
-
     def get(self, request, id):
         all_chats = []
         authorization_header = request.headers.get('Authorization')

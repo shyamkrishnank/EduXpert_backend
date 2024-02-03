@@ -30,7 +30,7 @@ urlpatterns = [
     path('eduadmin/', include('eduadmin.urls')),
     path('order/', include('order.urls')),
     path('chat/', include('chat.urls')),
-    path('notifications', include('notification.urls')),
+    path('notifications/', include('notification.urls')),
     path('chatbot', include('chatbot.urls')),
 ]
 
