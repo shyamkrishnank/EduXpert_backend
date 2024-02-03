@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # path of the environmental variables.
-ENV_PATH = os.path.join(BASE_DIR, 'env', '.env')
+ENV_PATH = os.path.join(BASE_DIR,'.env')
 
 load_dotenv(dotenv_path=ENV_PATH)
 
