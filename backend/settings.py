@@ -32,7 +32,13 @@ SECRET_KEY = 'django-insecure-k*^%_5$vq5mf71$l$_-m@&^&rasp=ag)ya0b#-97#nsfz*4q_i
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["http://51.21.82.18",
+                 "https://51.21.82.18",
+                 "https://eduxpert.cloud",
+                 "http://eduxpert.cloud",  # You can add both HTTP and HTTPS versions if needed
+                 "https://www.eduxpert.cloud",
+                 "localhost"
+                 ,]  # You can add variations of your domain
 
 
 # Application definition
@@ -73,13 +79,13 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    # "http://51.21.82.18",
-    # "https://51.21.82.18",
-    # "https://eduxpert.cloud",
-    # "http://eduxpert.cloud",  # You can add both HTTP and HTTPS versions if needed
-    # "https://www.eduxpert.cloud",  # You can add variations of your domain
-    "http://127.0.0.1:8000",
-    "http://localhost:5173"
+    "http://51.21.82.18",
+    "https://51.21.82.18",
+    "https://eduxpert.cloud",
+    "http://eduxpert.cloud",  # You can add both HTTP and HTTPS versions if needed
+    "https://www.eduxpert.cloud",  # You can add variations of your domain
+    # "http://127.0.0.1:8000",
+    # "http://localhost:5173"
 ]
 CORS_ALLOW_HEADERS = [
     'Accept',
@@ -127,7 +133,6 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [("127.0.0.1", 6379)],
-            # "hosts": [("51.21.82.18", 6379)],
         },
     },
 }
