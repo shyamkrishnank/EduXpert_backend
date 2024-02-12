@@ -9,7 +9,6 @@ from django.utils import timezone
 from datetime import timedelta
 from order.models import Wallet
 
-import json
 
 
 
